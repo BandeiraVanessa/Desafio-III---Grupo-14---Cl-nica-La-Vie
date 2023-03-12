@@ -30,7 +30,7 @@ export const findPsicologoById = async (id, includePassword = false) => {
  * Busca um psicologo por email
  * @param {string} email
  * @param {boolean} includePassword Opcional, true para incluir senha
- * @returns Retorna um psicologo, caso exita
+ * @returns Retorna um psicologo, caso exista
  */
 export const findPsicologoByEmail = async (email, includePassword = false) => {
   return await tables.Psicologos.findOne({
@@ -60,6 +60,7 @@ export const createPsicologo = async (nome, email, senha, apresentacao) => {
 
 /**
  * Atualiza o registro de um psicologo no banco de dados
+ * @param {number} id
  * @param {string} nome
  * @param {string} email
  * @param {string} senha
