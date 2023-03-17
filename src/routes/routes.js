@@ -3,6 +3,12 @@ import { login } from '../controllers/login.controller.js';
 import { getAllPsicologos } from '../controllers/psicologos.controller.js';
 import { auth } from '../middlewares/authentication.js';
 import { validateLogin } from '../middlewares/requestValidation.js';
+import {
+  getMeanAtendimentosPsicologos,
+  getNumeroAtendimentos,
+  getNumeroPacientes,
+  getNumeroPsicologos,
+} from '../controllers/dashboard.controller.js';
 
 const routes = Router();
 
@@ -29,9 +35,12 @@ routes.post('/atendimentos', auth); //A FAZER
 routes.get('/atendimentos/:id', auth); //A FAZER
 
 //DASHBOARD
-routes.get('/dashboard/numero-psicologos', auth); //A FAZER
-routes.get('/dashboard/numero-pacientes', auth); //A FAZER
-routes.get('/dashboard/numero-atendimentos', auth); //A FAZER
-routes.get('/dashboard/media-atendimentos-psicologos', auth); //A FAZER
+routes.get('/dashboard/numero-psicologos', getNumeroPsicologos);
+routes.get('/dashboard/numero-pacientes', getNumeroPacientes);
+routes.get('/dashboard/numero-atendimentos', getNumeroAtendimentos);
+routes.get(
+  '/dashboard/media-atendimentos-psicologos',
+  getMeanAtendimentosPsicologos
+);
 
 export default routes;
