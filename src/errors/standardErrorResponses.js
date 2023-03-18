@@ -6,3 +6,5 @@ export const requiredField = (field) => {
 export const fieldMustBeType = (field, type) => {
   return `Campo ${field} deve ser do tipo ${type}`;
 };
+export const minPasswordLength = 'Senha deve conter no mínimo 6 caracteres';
+export const notFound = 'Id não encontrado';

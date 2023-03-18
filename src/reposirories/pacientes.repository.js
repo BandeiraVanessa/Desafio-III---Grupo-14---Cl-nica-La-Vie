@@ -1,4 +1,3 @@
-import { hashPassword } from '../core/utils/crypt.js';
 import tables from '../database/models/index.js';
 
 /**
@@ -8,8 +7,7 @@ import tables from '../database/models/index.js';
  * ou um array vazio
  */
 export const findAllPacientes = async () => {
-  return await tables.Pacientes.findAll({
-  });
+  return await tables.Pacientes.findAll();
 };
 
 /**
@@ -18,11 +16,8 @@ export const findAllPacientes = async () => {
  * @param {boolean} includePassword Opcional, true para incluir senha
  * @returns Retorna um paciente, caso exista
  */
-export const findPacienteById = async (id, includePassword = false) => {
-  return await tables.Pacientes.findOne({
-    where: { id },
-    attributes: includePassword ? {} : { exclude: ['senha'] },
-  });
+export const findPacienteById = async (id) => {
+  return await tables.Pacientes.findOne({ where: { id } });
 };
 
 /**
@@ -31,28 +26,27 @@ export const findPacienteById = async (id, includePassword = false) => {
  * @param {boolean} includePassword Opcional, true para incluir senha
  * @returns Retorna um paciente, caso exista
  */
-export const findPacienteByEmail = async (email, includePassword = false) => {
-  return await tables.Pacientes.findOne({
-    where: { email },
-    attributes: includePassword ? {} : { exclude: ['senha'] },
-  });
+export const findPacienteByEmail = async (email) => {
+  return await tables.Pacientes.findOne({ where: { email } });
 };
 
 /**
  * Cria um novo registro de paciente no banco de dados
  * @param {string} nome
  * @param {string} email
- * @param {string} senha
- * @param {string} apresentacao
+ * @param {string} idade
  * @returns Retorna Paciente criado
  */
-export const createPaciente = async (nome, email, senha, apresentacao) => {
-  senha = hashPassword(senha);
+export const createPaciente = async (nome, email, idade) => {
+  if (await findPacienteByEmail(email)) {
+    const erro = new Error('Email já esta em uso');
+    erro.statusCode = 400;
+    throw erro;
+  }
   const paciente = await tables.Pacientes.create({
     nome,
     email,
-    senha,
-    apresentacao,
+    idade,
   });
   return await findPacienteById(paciente.id);
 };
@@ -66,12 +60,14 @@ export const createPaciente = async (nome, email, senha, apresentacao) => {
  * @param {string} apresentacao
  * @returns retorna paciente atualizado
  */
-export const updatePaciente = async (id, nome, email, senha, apresentacao) => {
-  senha ? (senha = hashPassword(senha)) : (senha = undefined);
-  await tables.Pacientes.update(
-    { nome, email, senha, apresentacao },
-    { where: { id } }
-  );
+export const updatePaciente = async (id, nome, email, idade) => {
+  const paciente = await findPacienteByEmail(email);
+  if (paciente && paciente.id != id) {
+    const erro = new Error('Email já esta em uso');
+    erro.statusCode = 400;
+    throw erro;
+  }
+  await tables.Pacientes.update({ nome, email, idade }, { where: { id } });
   return await findPacienteById(id);
 };
 
@@ -80,5 +76,6 @@ export const updatePaciente = async (id, nome, email, senha, apresentacao) => {
  * @param {number} id
  */
 export const deletePaciente = async (id) => {
-  await tables.Pacientes.destroy({ where: { id } });
+  await tables.Atendimentos.destroy({ where: { paciente_id: id } });
+  return await tables.Pacientes.destroy({ where: { id } });
 };

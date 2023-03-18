@@ -3,8 +3,10 @@ import {
   createAtendimento,
   findAllAtendimentos,
   findAtendimento,
-} from '../reposirories/atendimentos.repository.js';
+} from '../reposirories/atendimento.repository.js';
 import { verifyJwt } from '../core/utils/jwt.js';
+import { findPacienteById } from '../reposirories/pacientes.repository.js';
+import { findPsicologoById } from '../reposirories/psicologos.repository.js';
 
 export const getAtendimentos = async (req, res, next) => {
   try {
@@ -31,6 +33,18 @@ export const postAtendimento = async (req, res, next) => {
     const { authorization } = req.headers;
     const { id } = verifyJwt(authorization);
     const { paciente_id, data_atendimento, observacao } = req.body;
+    const pacienteExiste = await findPacienteById(paciente_id);
+    if (!pacienteExiste) {
+      const error = new Error('id de paciente fornecida não encontrada');
+      error.statusCode = 404;
+      throw error;
+    }
+    const PsicologoExiste = await findPsicologoById(id);
+    if (!PsicologoExiste) {
+      const error = new Error('Cadastro de psicologo não encontrado');
+      error.statusCode = 404;
+      throw error;
+    }
     const atendimento = await createAtendimento(
       id,
       paciente_id,

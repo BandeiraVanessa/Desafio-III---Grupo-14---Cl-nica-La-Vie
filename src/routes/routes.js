@@ -1,14 +1,36 @@
 import { Router } from 'express';
 import { login } from '../controllers/login.controller.js';
-import { getAllPsicologos } from '../controllers/psicologos.controller.js';
+import {
+  getAllPsicologos,
+  getOnePsicologo,
+  postPsicologo,
+  putPsicologo,
+  reqDeletePsicologo,
+} from '../controllers/psicologos.controller.js';
 import { auth } from '../middlewares/authentication.js';
-import { validateLogin } from '../middlewares/requestValidation.js';
+import {
+  validateAtendimentos,
+  validateLogin,
+  validatePsicologosReqBody,
+} from '../middlewares/requestValidation.js';
 import {
   getMeanAtendimentosPsicologos,
   getNumeroAtendimentos,
   getNumeroPacientes,
   getNumeroPsicologos,
 } from '../controllers/dashboard.controller.js';
+import {
+  getPacientes,
+  getPaciente,
+  postPaciente,
+  putPaciente,
+  reqDeletePaciente,
+} from '../controllers/pacientes.controller.js';
+import {
+  getAtendimentos,
+  getAtendimento,
+  postAtendimento,
+} from '../controllers/atendimentos.controller.js';
 
 const routes = Router();
 
@@ -17,22 +39,22 @@ routes.post('/login', validateLogin, login);
 
 //PSICOLOGOS
 routes.get('/psicologos', auth, getAllPsicologos);
-routes.post('/psicologos', auth); //A FAZER
-routes.get('/psicologos/:id', auth); //A FAZER
-routes.put('/psicologos/:id', auth); //A FAZER
-routes.delete('/psicologos/:id', auth); //A FAZER
+routes.post('/psicologos', validatePsicologosReqBody, postPsicologo);
+routes.get('/psicologos/:id', auth, getOnePsicologo);
+routes.put('/psicologos/:id', auth, validatePsicologosReqBody, putPsicologo);
+routes.delete('/psicologos/:id', auth, reqDeletePsicologo);
 
 //PACIENTES
-routes.get('/pacientes', auth); //A FAZER
-routes.post('/pacientes', auth); //A FAZER
-routes.get('/pacientes/:id', auth); //A FAZER
-routes.put('/pacientes/:id', auth); //A FAZER
-routes.delete('/pacientes/:id', auth); //A FAZER
+routes.get('/pacientes', auth, getPacientes);
+routes.post('/pacientes', auth, postPaciente);
+routes.get('/pacientes/:id', auth, getPaciente);
+routes.put('/pacientes/:id', auth, putPaciente);
+routes.delete('/pacientes/:id', auth, reqDeletePaciente);
 
 //ATENDIMENTOS
-routes.get('/atendimentos', auth); //A FAZER
-routes.post('/atendimentos', auth); //A FAZER
-routes.get('/atendimentos/:id', auth); //A FAZER
+routes.get('/atendimentos', auth, getAtendimentos);
+routes.post('/atendimentos', auth, validateAtendimentos, postAtendimento);
+routes.get('/atendimentos/:id', auth, getAtendimento);
 
 //DASHBOARD
 routes.get('/dashboard/numero-psicologos', getNumeroPsicologos);

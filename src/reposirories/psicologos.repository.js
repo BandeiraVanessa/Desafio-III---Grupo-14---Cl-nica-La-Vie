@@ -73,6 +73,12 @@ export const createPsicologo = async (nome, email, senha, apresentacao) => {
  * @returns retorna psicologo atualizado
  */
 export const updatePsicologo = async (id, nome, email, senha, apresentacao) => {
+  const psicologo = await findPsicologoByEmail(email);
+  if (psicologo && psicologo.id != id) {
+    const erro = new Error('Email já esta em uso');
+    erro.statusCode = 400;
+    throw erro;
+  }
   senha ? (senha = hashPassword(senha)) : (senha = undefined);
   await tables.Psicologos.update(
     { nome, email, senha, apresentacao },
@@ -86,5 +92,6 @@ export const updatePsicologo = async (id, nome, email, senha, apresentacao) => {
  * @param {number} id
  */
 export const deletePsicologo = async (id) => {
+  await tables.Atendimentos.destroy({ where: { psicologo_id: id } });
   return await tables.Psicologos.destroy({ where: { id } });
 };
